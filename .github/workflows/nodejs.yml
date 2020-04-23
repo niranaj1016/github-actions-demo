@@ -11,7 +11,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -27,8 +26,22 @@ jobs:
       
     - name: npm install start and test
       run: |
-        npm ci
         npm install
+        npm lint
         npm test
       env:
         CI: true
+      
+    -  name: docker build
+       uses: actions/docker/cli@master
+       with:
+        args: build -t k8niru/node-example .
+    -  name: docker login
+       uses: actions/docker/login@master
+       env:
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME}}
+    -  name: docker push
+       uses: actions/docker/cli@master
+       with:
+        args: push k8niru/node-example
